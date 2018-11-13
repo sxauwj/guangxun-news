@@ -1,5 +1,4 @@
 # 集成管理脚本
-from flask import session
 from flask_script import Manager
 from info import create_app
 
