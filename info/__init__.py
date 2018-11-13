@@ -22,5 +22,10 @@ def create_app(config_name):
     # 实例化Session
     Session(app)
 
+    # 导入蓝图对象
+    from info.modules.news import news_blue
+    # 注册蓝图
+    app.register_blueprint(news_blue)
+
     # 返回app
     return app

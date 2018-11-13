@@ -9,12 +9,5 @@ app = create_app('development')
 # 使用管理器对象,将管理器关联app
 manage = Manager(app)
 
-
-@app.route('/')
-def index():
-    session['authen'] = 'id'
-    return 'index'
-
-
 if __name__ == '__main__':
     manage.run()
