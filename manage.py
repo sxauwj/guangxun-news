@@ -38,7 +38,7 @@ manage = Manager(app)
 def index():
     session['authen'] = 'id'
     return 'index'
-
+ 
 
 if __name__ == '__main__':
     manage.run()
