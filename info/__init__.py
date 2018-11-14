@@ -7,12 +7,14 @@ from flask_session import Session
 # 导入class_dict字典
 from config import class_dict
 
+
 # 创建sqlalchemy对象
 db = SQLAlchemy()
 
 def create_app(config_name):
     # 创建Flask实例app
     app = Flask(__name__)
+    print(__name__)
     # app的配置信息
     app.config.from_object(class_dict['Development'])
 
