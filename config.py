@@ -10,9 +10,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@localhost/guangxun'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # 实现状态保持
+    # 实现状态保持,配置session信息存储在redis中
+    REDIS_HOST = '127.0.0.1'
+    REDIS_PORT = 6379
     SESSION_TYPE = 'redis'
-    SESSION_REDIS = StrictRedis(host='127.0.0.1', port=6379)
+    SESSION_REDIS = StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
     # 设置session 有效期的设置，该属性是Flask内置的session有效期
     PERMANENT_SESSION_LIFITIME = 86400
     # 设置session密钥
