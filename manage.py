@@ -5,7 +5,6 @@ from flask_migrate import Migrate, MigrateCommand
 # 导入info目录下的create_app
 from info import create_app, db, models
 
-
 # 调用函数，获取app，传入参数，通过参数的不同，可以获取不同环境下的app
 app = create_app('development')
 
@@ -14,7 +13,6 @@ manage = Manager(app)
 # 使用迁移框架
 Migrate(app, db)
 manage.add_command('db', MigrateCommand)
-
 
 if __name__ == '__main__':
     manage.run()

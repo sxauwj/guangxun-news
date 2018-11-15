@@ -1,9 +1,12 @@
 # 导入创建redis实例的StrictRedis
 from redis import StrictRedis
+# 集成python的标准日志模块
+import logging
 
 
 class Config:
     DEBUG = None
+    LOG_LEVEL = logging.DEBUG
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@localhost/guangxun'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -23,10 +26,11 @@ class Development(Config):
 # 生产模式
 class Production(Config):
     DEBUG = False
+    LOG_LEVEL = logging.ERROR
 
 # 定义字典，实现不同环境下的配置类的映射
 class_dict ={
-    'Development': Development,
-    'Production': Production,
+    'development': Development,
+    'production': Production,
 
 }
