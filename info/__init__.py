@@ -12,8 +12,8 @@ from logging.handlers import RotatingFileHandler
 # 导入redis模块
 from redis import StrictRedis
 
-# 实例化redis对象
-redis_store = StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT)
+# 实例化redis对象，因为redis取出来的数据是二进制，需要加上decode_responses 让响应转为字符串
+redis_store = StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT,decode_responses=True)
 
 # 创建sqlalchemy对象
 db = SQLAlchemy()
