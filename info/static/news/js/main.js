@@ -299,3 +299,11 @@ function generateUUID() {
     });
     return uuid;
 }
+
+// 用户退出
+function logout() {
+    $.get('/logout',function (resp) {
+        location.reload()
+    })
+
+}
