@@ -95,7 +95,7 @@ $(function () {
         $(this).find('a')[0].click()
     })
 
-    // TODO 登录表单提交
+    // 登录表单提交
     $(".login_form_con").submit(function (e) {
         e.preventDefault()
         var mobile = $(".login_form #mobile").val()
@@ -112,6 +112,24 @@ $(function () {
         }
 
         // 发起登录请求
+        var params = {
+            'mobile':mobile,
+            'password':password
+        };
+        $.ajax({
+            url:'/login',
+            type:'post',
+            data:JSON.stringify(params),
+            contentType:'application/json',
+            success:function (resp) {
+                if (resp.errno == '0'){
+                    // 刷新当前页面
+                    location.reload();
+                }else{
+                    alert(resp.errmsg);
+                }
+            }
+        })
     })
 
 

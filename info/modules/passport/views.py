@@ -242,7 +242,7 @@ def login():
     if not all([mobile,password]):
         return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
     # 检查手机号的格式
-    if not re.match(r'1[3456789]\d{9}$'):
+    if not re.match(r'1[3456789]\d{9}$',mobile):
         return jsonify(errno=RET.PARAMERR, errmsg='手机号格式错误')
     # 检查手机号是否注册
     try:
@@ -258,7 +258,7 @@ def login():
     # 提交数据
     try:
         db.session.add(user)
-        db.seddion.commit()
+        db.session.commit()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR,errmsg='保存用户数据失败')
