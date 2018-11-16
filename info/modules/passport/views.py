@@ -14,7 +14,8 @@ import re, random
 from info.libs.yuntongxun.sms import CCP
 # 导入模型类
 from info.models import User
-
+# 导入日期模块
+from datetime import datetime
 
 @passport_blue.route('/image_code')
 def generate_image_code():
@@ -192,7 +193,7 @@ def register():
         return jsonify(errno=RET.DBERR, errmsg='查询用户信息失败')
     else:
         if user:
-            return jsonify(errno=RET.DATAERR, errmsg='手机号已注册2')
+            return jsonify(errno=RET.DATAERR, errmsg='手机号已注册')
     # 构造模型类对象，存储用户信息，实现密码的加密存储
     user = User()
     user.mobile = mobile
@@ -215,3 +216,57 @@ def register():
     session['nick_name'] = user.nick_name
     # 返回结果
     return jsonify(errno=RET.OK, errmsg='OK')
+
+@passport_blue.route('/login',methods=['POST'])
+def login():
+    """
+    用户登录
+    1.获取参数，mobile　password
+    2.检查参数的完整性
+        3.检查手机号格式
+            4.根据手机号查询用户信息，确认用户已经注册
+            5.确认查询结果
+                6.确认密码正确
+                    7.更新用户登录时间
+                    　　8.提交数据到mysql数据库
+                    　　　　9.缓存用户信息
+                        　　因为用户可以登录多次，有可能修改昵称，如果修改昵称，则是修改后的结果，若未修改则默认手机号
+                            session['nick_name'] = user.nick_name
+                            10.返回结果
+    :return:
+    """
+    # 获取参数
+    mobile = request.json.get('mobile')
+    password = request.json.get('password')
+    # 检查参数
+    if not all([mobile,password]):
+        return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
+    # 检查手机号的格式
+    if not re.match(r'1[3456789]\d{9}$'):
+        return jsonify(errno=RET.PARAMERR, errmsg='手机号格式错误')
+    # 检查手机号是否注册
+    try:
+        user = User.query.filter_by(mobile=mobile).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg='查询数据库失败')
+    if user is None or not user.check_password(password):
+        return jsonify(errno=RET.DATAERR,errmsg='用户名或密码错误')
+
+    # 保存登录时间
+    user.last_login = datetime.now()
+    # 提交数据
+    try:
+        db.session.add(user)
+        db.seddion.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg='保存用户数据失败')
+    # 缓存用户信息
+    session['user_id'] = user.id
+    session['mobile'] = mobile
+    # 注意：缓存用户信息和注册时的缓存不同，因为用户可以登录多次，有可能修改昵称，若修改则使用修改的，未修改则默认使用手机号
+    # 确保redis中的缓存数据和mysql中的真实数据是一致的
+    session['nick_name'] = user.nick_name
+    # 返回结果
+    return jsonify(errno=RET.OK,errmsg='OK')
