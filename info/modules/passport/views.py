@@ -105,10 +105,10 @@ def send_sms_code():
     try:
         user = User.query.filter(User.mobile == mobile).first()
     except Exception as e:
-        return jsonify(errno=RET.DAERR, errmsg='查询用户数据失败')
+        return jsonify(errno=RET.DBERR, errmsg='查询用户数据失败')
     else:
-        # if user is not None:
-        return jsonify(errno=RET.DATAEXIST, errmsg='手机号已注册')
+        if user is not None:
+            return jsonify(errno=RET.DATAEXIST, errmsg='手机号已注册')
 
     # 生成短信随机码
     sms_code = '%06d' % random.randint(0, 999999)
@@ -125,7 +125,7 @@ def send_sms_code():
         ccp = CCP()
         # 第一个参数是手机号，第二个参数是短信内容，第三个参数是模板ｉｄ
         result = ccp.send_template_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES / 60], 1)
-        print("result是：", sms_code)
+
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.THIRDERR, errmsg='发送短信异常')
@@ -192,7 +192,7 @@ def register():
         return jsonify(errno=RET.DBERR, errmsg='查询用户信息失败')
     else:
         if user:
-            return jsonify(errno=RET.DATAERR, errmsg='手机号已注册')
+            return jsonify(errno=RET.DATAERR, errmsg='手机号已注册2')
     # 构造模型类对象，存储用户信息，实现密码的加密存储
     user = User()
     user.mobile = mobile

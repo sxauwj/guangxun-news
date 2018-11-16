@@ -115,7 +115,7 @@ $(function () {
     })
 
 
-    // TODO 注册按钮点击
+    // 注册按钮点击
     $(".register_form_con").submit(function (e) {
         // 阻止默认提交操作
         e.preventDefault()
@@ -146,6 +146,27 @@ $(function () {
         }
 
         // 发起注册请求
+        var params = {
+            'mobile':mobile,
+            'sms_code':smscode,
+            'password':password
+        };
+        $.ajax({
+            url:'/register',
+            type:'post',
+            data:JSON.stringify(params),
+            contentType:'application/json',
+            success:function(resp){
+                if (resp.errno == '0'){
+                    location.reload();
+                }else{
+                    $('#register-password-err').html(resp.errmsg);
+                    $('#register-password-err').show();
+                }
+            }
+
+
+        })
 
     })
 });
@@ -202,7 +223,7 @@ function sendSMSCode() {
             if (resp.errno == '0'){
                 // 使用定时器，控制发送
             var num = 60;
-            alert('发送')
+
             var t = setInterval(function(){
                 if (num==0){
                     // 清除定时器对象
