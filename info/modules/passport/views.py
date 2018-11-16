@@ -53,6 +53,7 @@ def generate_image_code():
         # 返回响应
         return response
 
+
 @passport_blue.route('/sms_code', methods=['POST'])
 def send_sms_code():
     """
@@ -103,6 +104,7 @@ def send_sms_code():
 
     # 生成短信随机码
     sms_code = '%06d' % random.randint(0,999999)
+
     # 存入redis中
     try:
         redis_store.setex('SMSCode_' + mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
@@ -115,6 +117,7 @@ def send_sms_code():
         ccp = CCP()
         # 第一个参数是手机号，第二个参数是短信内容，第三个参数是模板ｉｄ
         result = ccp.send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES/60],1)
+        print("result是：",sms_code)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.THIRDERR, errmsg='发送短信异常')

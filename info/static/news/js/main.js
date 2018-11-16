@@ -148,10 +148,10 @@ $(function () {
         // 发起注册请求
 
     })
-})
+});
 
 // 全局变量，生成uuid，下次再传给后端用来比较用户输入是否正确
-var imageCodeId = ""
+var imageCodeId = "";
 
 // 生成一个图片验证码的编号，并设置页面中图片验证码img标签的src属性
 function generateImageCode() {
@@ -181,7 +181,49 @@ function sendSMSCode() {
         return;
     }
 
-    // TODO 发送短信验证码
+    //  发送短信验证码
+    // 定义参数对象
+    var params = {
+        'mobile':mobile,
+        'image_code':imageCode,
+        'image_code_id':imageCodeId
+    };
+
+    // 发送ajax请求
+    $.ajax({
+        url:'/sms_code',
+        type:'post',
+        // 把参数转成json
+        data:JSON.stringify(params),
+        // 发送到后端的数据类型
+        contentType:'application/json',
+        success:function (resp) {
+            // 如果发送成功
+            if (resp.errno == '0'){
+                // 使用定时器，控制发送
+            var num = 60;
+            alert('发送')
+            var t = setInterval(function(){
+                if (num==0){
+                    // 清除定时器对象
+                    clearInterval(t);
+                    $('.get_code').attr('onclick','sendSMSCode();') // 分号表示是个函数
+                    $('.get_code').html('点击获取验证码');
+                }else{
+                    num -= 1;
+                    $('.get_code').html(num + '秒')
+                }
+            },1000)
+            }else{
+                // alert(resp.errmsg)
+                $('#register-sms-code-err').html(resp.errmsg);
+                $('#register-sms-code-err').show()
+            }
+
+        }
+
+    })
+
 }
 
 // 调用该函数模拟点击左侧按钮
