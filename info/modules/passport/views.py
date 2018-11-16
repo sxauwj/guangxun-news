@@ -123,7 +123,7 @@ def send_sms_code():
         return jsonify(errno=RET.THIRDERR, errmsg='发送短信异常')
     # 判断发送结果
     if result == 0:
-        return jsonify(errno=RET.OK,errmsg='发送成功')
+        return jsonify(errno=RET.OK,errmsg='发送成功') 
     else:
         return jsonify(errno=RET.THIRDERR, errmsg='发送失败')
 
