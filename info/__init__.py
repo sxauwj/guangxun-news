@@ -11,6 +11,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 # 导入redis模块
 from redis import StrictRedis
+# 项目开启csrf保护
+from flask_wtf import CSRFProtect,csrf
 
 # 实例化redis对象，因为redis取出来的数据是二进制，需要加上decode_responses 让响应转为字符串
 redis_store = StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT,decode_responses=True)
@@ -45,6 +47,16 @@ def create_app(config_name):
 
     # 实例化Session
     Session(app)
+
+    # 开启csrf保护
+    CSRFProtect(app)
+
+    # 生成csrf＿token,给每个客户端都设置csrf_token
+    @app.after_request
+    def after_request(response):
+        csrf_token = csrf.generate_csrf()
+        response.set_cookie('csrf_token',csrf_token)
+        return response
 
     # 导入蓝图对象
     from info.modules.news import news_blue

@@ -3,7 +3,7 @@ from . import passport_blue
 # 导入captcha工具，生成图片验证码
 from info.utils.captcha.captcha import captcha
 # 导入flask内置对象
-from flask import request, jsonify, current_app, make_response, session
+from flask import request, jsonify, current_app, make_response, session,render_template,redirect
 # 导入自定义状态码
 from info.utils.response_code import RET
 # 导入redis实例 导入常量 导入db实例对象
@@ -79,6 +79,7 @@ def send_sms_code():
     mobile = request.json.get('mobile')
     image_code = request.json.get('image_code')
     image_code_id = request.json.get('image_code_id')
+    print("参数值",mobile,image_code,image_code_id)
     # 检查参数完整性
     if not all([mobile, image_code, image_code_id]):
         return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
@@ -100,8 +101,8 @@ def send_sms_code():
     except Exception as e:
         current_app.logger.error(e)
         # 比较图片验证码是否正确
-        if real_image_code.lower() != image_code.lower():
-            return jsonify(errno=RET.DATAERR, errmsg='图片验证码错误 ')
+    if real_image_code.lower() != image_code.lower():
+        return jsonify(errno=RET.DATAERR, errmsg='图片验证码错误 ')
     # 根据手机号来查询用户未注册，使用模型类User
     try:
         user = User.query.filter(User.mobile == mobile).first()

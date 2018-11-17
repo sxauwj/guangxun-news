@@ -121,6 +121,9 @@ $(function () {
             type:'post',
             data:JSON.stringify(params),
             contentType:'application/json',
+            headers:{
+                'X-CSRFToken':getCookie('csrf_token')
+            },
             success:function (resp) {
                 if (resp.errno == '0'){
                     // 刷新当前页面
@@ -174,6 +177,9 @@ $(function () {
             type:'post',
             data:JSON.stringify(params),
             contentType:'application/json',
+            headers:{
+                'X-CSRFToken':getCookie('csrf_token')
+            },
             success:function(resp){
                 if (resp.errno == '0'){
                     location.reload();
@@ -214,8 +220,8 @@ function sendSMSCode() {
     }
     var imageCode = $("#imagecode").val();
     if (!imageCode) {
-        $("#image-code-err").html("请填写验证码！");
-        $("#image-code-err").show();
+        $("#register-image-code-err").html("请填写验证码！");
+        $("#register-image-code-err").show();
         $(".get_code").attr("onclick", "sendSMSCode();");
         return;
     }
@@ -236,6 +242,9 @@ function sendSMSCode() {
         data:JSON.stringify(params),
         // 发送到后端的数据类型
         contentType:'application/json',
+        headers:{
+                'X-CSRFToken':getCookie('csrf_token')
+            },
         success:function (resp) {
             // 如果发送成功
             if (resp.errno == '0'){
@@ -246,8 +255,7 @@ function sendSMSCode() {
                 if (num==0){
                     // 清除定时器对象
                     clearInterval(t);
-                    $('.get_code').attr('onclick','sendSMSCode();') // 分号表示是个函数
-                    $('.get_code').html('点击获取验证码');
+
                 }else{
                     num -= 1;
                     $('.get_code').html(num + '秒')
@@ -257,6 +265,10 @@ function sendSMSCode() {
                 // alert(resp.errmsg)
                 $('#register-sms-code-err').html(resp.errmsg);
                 $('#register-sms-code-err').show()
+                generateImageCode()
+                $('.get_code').attr('onclick','sendSMSCode();') // 分号表示是个函数
+                $('.get_code').html('点击获取验证码');
+
             }
 
         }
