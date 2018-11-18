@@ -15,7 +15,7 @@
         <a href="#" class="logo fl"><img src="../../static/news/images/logo.png" alt="logo"></a>
         <ul class="menu fl">
             {% for category in data.category_list %}
-                <li class="{% if loop.index0 == 0 %}active{% endif %}" data-cid="{{ loop.index0 }}"><a href="javascript:;">{{ category.name }}</a></li>
+                <li class="{% if loop.index0 == 0 %}active{% endif %}" data-cid="{{ category.id }}"><a href="javascript:;">{{ category.name }}</a></li>
 
             {% endfor %}
 

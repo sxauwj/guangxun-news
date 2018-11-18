@@ -113,7 +113,7 @@ def news_list():
 
         filters.append(News.category_id == cid)
     try:
-        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page.per_page,False)
+        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page,per_page,False)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(errno=RET.DBERR,errmsg='查询新闻列表失败')
