@@ -52,6 +52,7 @@ def create_app(config_name):
     CSRFProtect(app)
 
     # 生成csrf＿token,给每个客户端都设置csrf_token
+    # 第一次请求为get,请求之后便给每个客户端加上了cookie
     @app.after_request
     def after_request(response):
         csrf_token = csrf.generate_csrf()
@@ -65,5 +66,8 @@ def create_app(config_name):
     from info.modules.passport import passport_blue
     app.register_blueprint(passport_blue)
 
+    # 导入自定义过滤器
+    from info.utils.commons import index_filter
+    app.add_template_filter(index_filter,'index_filter')
     # 返回app
     return app

@@ -79,7 +79,6 @@ def send_sms_code():
     mobile = request.json.get('mobile')
     image_code = request.json.get('image_code')
     image_code_id = request.json.get('image_code_id')
-    print("参数值",mobile,image_code,image_code_id)
     # 检查参数完整性
     if not all([mobile, image_code, image_code_id]):
         return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
