@@ -1,4 +1,4 @@
-from flask import render_template, current_app,jsonify,request,g
+from flask import render_template, current_app, jsonify, request, g
 # 导入蓝图对象，使用蓝图创建路由映射
 from . import news_blue
 # 导入flask内置的对象
@@ -6,11 +6,15 @@ from flask import session
 # 导入模型类
 from info.models import User, News, Category
 # 导入常量文件
-from info import constants,db
+from info import constants, db
 # 导入响应状态码
 from info.utils.response_code import RET
+# 导入登录验证装饰器
+from info.utils.commons import login_required
+
 
 @news_blue.route('/')
+@login_required
 def index():
     """
     一.首页：
@@ -23,15 +27,18 @@ def index():
 
     :return:
     """
-    user_id = session.get('user_id')
+    # user_id = session.get('user_id')
+    #
+    # user = None
+    # # 根据user_id 读取mysql，获取用户信息
+    # if user_id:
+    #     try:
+    #         user = User.query.get(user_id)
+    #     except Exception as e:
+    #         current_app.logger.error(e)
 
-    user = None
-    # 根据user_id 读取mysql，获取用户信息
-    if user:
-        try:
-            user = User.query.get(user_id)
-        except Exception as e:
-            current_app.logger.error(e)
+    # 　登录验证成功可以获得g.user
+    user = g.user
 
     # 新闻点击排行
     try:
@@ -39,11 +46,10 @@ def index():
 
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,errmsg='查询新闻排行数据失败')
+        return jsonify(errno=RET.DBERR, errmsg='查询新闻排行数据失败')
     # 判断查询结果
     if not news_list:
-
-        return jsonify(errno=RET.NODATA,errmsg='无新闻')
+        return jsonify(errno=RET.NODATA, errmsg='无新闻')
     # 定义容器，存储新闻数据
     news_click_list = []
     for news in news_list:
@@ -54,28 +60,26 @@ def index():
         categories = Category.query.all()
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,errmsg='查询数据库失败')
+        return jsonify(errno=RET.DBERR, errmsg='查询数据库失败')
     # 判断查询结果
     if not categories:
-        return jsonify(errno=RET.NODATA,errmsg='无新闻分类')
+        return jsonify(errno=RET.NODATA, errmsg='无新闻分类')
     # 定义容器，存储新闻分类数据
     category_list = []
     for category in categories:
         category_list.append(category.to_dict())
-        print('category',category)
-        print('category_to_dict',category.to_dict())
-
-
+        print('category', category)
+        print('category_to_dict', category.to_dict())
 
     data = {
         # 三元运算　如果user存在则user_info有值否则为None
-        'user_info': user.to_dict() if user else None ,
-        'news_click_list':news_click_list,
-        'category_list':category_list
+        'user_info': user.to_dict() if user else None,
+        'news_click_list': news_click_list,
+        'category_list': category_list
 
     }
 
-    return render_template('news/index.html',data=data)
+    return render_template('news/index.html', data=data)
 
 
 @news_blue.route('/news_list')
@@ -97,26 +101,25 @@ def news_list():
 
     """
     # 获取参数
-    cid = request.args.get('cid','1')
-    page = request.args.get('page','1')
-    per_page = request.args.get('per_page','10')
+    cid = request.args.get('cid', '1')
+    page = request.args.get('page', '1')
+    per_page = request.args.get('per_page', '10')
     # 检查参数
     try:
         cid, page, per_page = int(cid), int(page), int(per_page)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.PARAMERR,errmsg='参数类型错误')
+        return jsonify(errno=RET.PARAMERR, errmsg='参数类型错误')
     # 根据分类id查询数据库
     filters = []
     # 如果分类id不是最新即id为１，添加分类id给filters过滤条件
     if cid > 1:
-
         filters.append(News.category_id == cid)
     try:
-        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page,per_page,False)
+        paginate = News.query.filter(*filters).order_by(News.create_time.desc()).paginate(page, per_page, False)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,errmsg='查询新闻列表失败')
+        return jsonify(errno=RET.DBERR, errmsg='查询新闻列表失败')
     # 使用分页对象，获取分页后的数据　总数据　总页数　当前页数
     # 列表形式　存储对象
     news_list = paginate.items
@@ -128,17 +131,92 @@ def news_list():
         news_dict_list.append(news.to_dict())
     # 定义容器
     data = {
-        'total_page':total_page,
-        'current_page':current_page,
-        'news_dict_list':news_dict_list
+        'total_page': total_page,
+        'current_page': current_page,
+        'news_dict_list': news_dict_list
     }
     # 返回数据
-    return jsonify(errno=RET.OK,errmsg='OK',data = data)
+    return jsonify(errno=RET.OK, errmsg='OK', data=data)
+
+
+@news_blue.route('/<int:news_id>')
+@login_required
+def news_detail(news_id):
+    """
+    新闻详情：
+    １.根据news_id，查询mysql数据库
+    ２.使用模板渲染数据
+    :param news_id:
+    :return:
+    """
+
+    # user_id = session.get('user_id')
+    #
+    # user = None
+    # # 根据user_id 读取mysql，获取用户信息
+    # if user_id:
+    #     try:
+    #         user = User.query.get(user_id)
+    #     except Exception as e:
+    #         current_app.logger.error(e)
+
+    user = g.user
+
+    # 新闻点击排行
+    try:
+        news_list = News.query.order_by(News.clicks.desc()).limit(constants.CLICK_RANK_MAX_NEWS)
+
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询新闻排行数据失败')
+    # 判断查询结果
+    if not news_list:
+        return jsonify(errno=RET.NODATA, errmsg='无新闻')
+    # 定义容器，存储新闻数据
+    news_click_list = []
+    for news in news_list:
+        news_click_list.append(news.to_dict())
+
+    # 查询数据库显示新闻详情
+    try:
+        news = News.query.get(news_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='查询新闻详情失败')
+    # 判断查询结果
+    if not news:
+        return jsonify(errno=RET.NODATA, errmsg='无新闻数据')
+    news.clicks += 1
+    try:
+        db.session.add(news)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg='保存数据失败')
+
+    # 定义标记，用来标识用户是否已经收藏该新闻
+    is_collected = False
+    # 判断用户是否登录，以及用户是否收藏该新闻
+    if g.user and news in user.collection_news:
+        is_collected = True
+
+    # 定义容器，返回数据
+
+
+
+    data = {
+        'news_detail': news.to_dict(),
+        # 三元运算　如果user存在则user_info有值否则为None
+        'user_info': user.to_dict() if user else None,
+        'news_click_list': news_click_list,
+        'is_collected': is_collected
+    }
+
+    return render_template('news/detail.html', data=data)
 
 
 @news_blue.route('/favicon.ico')
 def favicon():
     # 把favicon图标传给浏览器，发送静态文件给浏览器
     return current_app.send_static_file('news/favicon.ico')
-
-

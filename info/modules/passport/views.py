@@ -239,7 +239,7 @@ def login():
     mobile = request.json.get('mobile')
     password = request.json.get('password')
     # 检查参数
-    if not all([mobile,password]):
+    if not  all([mobile,password]):
         return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
     # 检查手机号的格式
     if not re.match(r'1[3456789]\d{9}$',mobile):
@@ -257,7 +257,7 @@ def login():
     user.last_login = datetime.now()
     # 提交数据
     try:
-        db.session.add(user)
+        # db.session.add(user)
         db.session.commit()
     except Exception as e:
         current_app.logger.error(e)
