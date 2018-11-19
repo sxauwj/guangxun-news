@@ -197,23 +197,87 @@ def news_detail(news_id):
 
     # 定义标记，用来标识用户是否已经收藏该新闻
     is_collected = False
+    # 是否显示提醒登录框
+    tips = True
     # 判断用户是否登录，以及用户是否收藏该新闻
     if g.user and news in user.collection_news:
+        tips = False
         is_collected = True
 
     # 定义容器，返回数据
-
-
-
     data = {
         'news_detail': news.to_dict(),
         # 三元运算　如果user存在则user_info有值否则为None
         'user_info': user.to_dict() if user else None,
         'news_click_list': news_click_list,
-        'is_collected': is_collected
+        'is_collected': is_collected,
+        'tips': tips
     }
 
     return render_template('news/detail.html', data=data)
+
+
+@news_blue.route('/news_collect', methods=['POST'])
+@login_required
+def user_collect():
+    """
+    用户收藏取消收藏
+    1.判断用户是否登录
+    2.如果没登录，返回错误信息
+    3.获取参数，news_id, action[collect,cancel_collect]
+    4.检查参数的完整性
+    5.转换参数类型news_id
+    6.检查action是否是［collect,cancel_collect]
+    7.判断如果用户选择的是收藏，添加该新闻
+    8.否则，移除用户收藏的新闻
+    9.返回结果
+    :return:
+    """
+    # 验证是否登录
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.SESSIONERR, errmsg='用户未登录')
+    # 获取参数
+    news_id = request.json.get('news_id')
+    action = request.json.get('action')
+    # 检查参数
+    if not all([news_id, action]):
+        return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
+    # 转换参数类型
+    try:
+        news_id = int(news_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg='参数类型错误')
+    # 检查action参数
+    if action not in ['collect', 'cancel_collect']:
+        return jsonify(errno=RET.PARAMERR, errmsg='参数格式错误')
+    # 根据news_id查询新闻，确认新闻的存在
+    news = None
+    try:
+        news = News.query.get(news_id)
+    except Exception as e:
+        current_app.logger.error(e)
+    if not news:
+        return jsonify(errno=RET.NODATA, errmsg='无新闻数据')
+    # 如果用户是收藏
+    if action == 'collect':
+        # 判断用户没有收藏过
+        if news not in user.collection_news:
+            user.collection_news.append(news)
+    else:
+        user.collection_news.remove(news)
+    # 提交数据
+    try:
+        db.session.add(news)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg='保存数据失败')
+
+    # 返回结果
+    return jsonify(errno=RET.OK, errmsg='OK')
 
 
 @news_blue.route('/favicon.ico')

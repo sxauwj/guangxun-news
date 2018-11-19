@@ -22,7 +22,7 @@
             <a href="javascript:;" onclick="logout()">退出</a>
         {% else %}
             <div class="user_btns fr">
-                <a href="javascript:;" class="login_btn">登录</a> / <a href="javascript:;" class="register_btn">注册</a>
+                <a href="javascript:;" class="login_btn">登录</a>  <a href="javascript:;" class="register_btn">注册</a>
             </div>
         {% endif %}
         </div>
@@ -39,12 +39,15 @@
 
         {{ data.news_detail.content | safe }}
 
-        <a href="javascript:;" class="collection block-center">收藏</a>
-        <a href="javascript:;" class="collected block-center" style="display: none"><span class="out">已收藏</span><span
-                class="over">取消收藏</span></a>
+{#        <a href="javascript:;" class="collection block-center">收藏</a>#}
+{#        <a href="javascript:;" class="collected block-center" style="display: none"><span class="out">已收藏</span><span#}
+{#                class="over">取消收藏</span></a>#}
+        <a href="javascript:;" class="collected block-center" data-newid="{{ data.news_detail.id }}" style="display: {% if data.is_collected %} block
+        {% else %} none {% endif %};"><span class="out">已收藏</span><span class="over">取消收藏</span></a>
+        <a href="javascript:;" class="collection block-center" data-newid="{{ data.news_detail.id }}" style="display: {% if data.is_collected %} none
+        {% else %} block {% endif %};">收藏</a>
 
-
-        <div class="comment_form_logout">
+        <div class="comment_form_logout" style="display:{% if not data.tips %} none {% endif %}">
             登录发表你的评论
         </div>
 
@@ -190,11 +193,11 @@
             <a href="javascript:;" class="shutoff"></a>
         </div>
         <div class="form_group">
-            <input type="text" name="username" autocomplete="off">
+            <input type="text" name="username" autocomplete="off" id="mobile">
             <div class="input_tip">用户名/手机号</div>
         </div>
         <div class="form_group">
-            <input type="password" name="password">
+            <input type="password" name="password" id="password">
             <div class="input_tip">密码(不少于6位)</div>
         </div>
         <input type="submit" name="" value="登 录" class="input_sub">
