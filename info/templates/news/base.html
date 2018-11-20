@@ -48,7 +48,7 @@
         <ul class="rank_list">
             {% for datum in data.news_click_list %}
 {#                <li><span class="{{ loop.cycle("first",'second','third','','','') }}">{{ loop.index }}</span><a href="#">{{ datum.title }}</a></li>#}
-                <li><span class={{ loop.index | index_filter}}>{{ loop.index }}</span><a href="#">{{ datum.title }}</a></li>
+                <li><span class={{ loop.index | index_filter}}>{{ loop.index }}</span><a href="/{{ datum.id }}">{{ datum.title }}</a></li>
 
             {% endfor %}
 

@@ -4,7 +4,7 @@ from . import news_blue
 # 导入flask内置的对象
 from flask import session
 # 导入模型类
-from info.models import User, News, Category
+from info.models import  News, Category,Comment
 # 导入常量文件
 from info import constants, db
 # 导入响应状态码
@@ -178,6 +178,7 @@ def news_detail(news_id):
         news_click_list.append(news.to_dict())
 
     # 查询数据库显示新闻详情
+    news = None
     try:
         news = News.query.get(news_id)
     except Exception as e:
@@ -187,6 +188,9 @@ def news_detail(news_id):
     if not news:
         return jsonify(errno=RET.NODATA, errmsg='无新闻数据')
     news.clicks += 1
+
+
+
     try:
         db.session.add(news)
         db.session.commit()
@@ -194,6 +198,8 @@ def news_detail(news_id):
         current_app.logger.error(e)
         db.session.rollback()
         return jsonify(errno=RET.DBERR, errmsg='保存数据失败')
+
+
 
     # 定义标记，用来标识用户是否已经收藏该新闻
     is_collected = False
@@ -204,6 +210,20 @@ def news_detail(news_id):
         tips = False
         is_collected = True
 
+    # 新闻评论信息
+    try:
+        comment_list = Comment.query.filter(Comment.news_id == news.id).order_by(Comment.create_time.desc())
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg='查询新闻评论失败')
+    # 定义容器
+    comments = []
+    # 如果该新闻有评论
+    if comment_list:
+        for comment in comment_list:
+            comments.append(comment.to_dict())
+
+
     # 定义容器，返回数据
     data = {
         'news_detail': news.to_dict(),
@@ -211,7 +231,9 @@ def news_detail(news_id):
         'user_info': user.to_dict() if user else None,
         'news_click_list': news_click_list,
         'is_collected': is_collected,
-        'tips': tips
+        'tips': tips,
+        'comments':comments,
+        # 'auth_user':auth_user
     }
 
     return render_template('news/detail.html', data=data)
@@ -279,6 +301,70 @@ def user_collect():
     # 返回结果
     return jsonify(errno=RET.OK, errmsg='OK')
 
+
+@news_blue.route('/news_comment',methods=['POST'])
+@login_required
+def news_comments():
+    """
+    新闻评论
+    获取参数－－检查参数－－处理参数－－返回结果
+    1.用户必要登录
+    2.检查参数　news_id , comment, parent_id(可选)
+    3.转换参数的数据类型，判断parent_id是否存在
+    4．查询新闻，确认新闻的存在
+    5.保存评论信息，判断parent_id是否存在
+    6.提交数据
+    7.返回结果
+    :return:
+    """
+    # 判断用户是否已经登录
+    user = g.user
+    if not user:
+        return jsonify(errno=RET.SESSIONERR,errmsg='用户未登录')
+
+    # 获取参数
+    news_id = request.json.get('news_id')
+    content = request.json.get('comment')
+    parent_id = request.json.get('parent_id')
+
+    # 检查参数
+    if not all([news_id,content]):
+        return jsonify(errno=RET.PARAMERR,errmsg='参数缺失')
+    # 转换类型，防止获得不合法数据，增加程序的健壮性
+    try:
+        news_id = int(news_id)
+        # 如果有父评论
+        if parent_id:
+            parent_id = int(parent_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR,errmsg='参数类型错误')
+    # 查询数据库，确认新闻存在
+    try:
+        news = News.query.get(news_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg='查询新闻失败')
+    # 判断查询结果
+    if not news:
+        return jsonify(errno=RET.NODATA,errmsg='无新闻数据')
+    #　构造评论的模型对象
+    comment = Comment()
+    comment.user_id = user.id
+    comment.news_id = news.id
+    comment.content = content
+    # 如果父评论存在，保存父评论信息
+    if parent_id:
+        comment.parent_id = parent_id
+    try:
+        db.session.add(comment)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR,errmsg='保存评论失败')
+    # 返回结果
+    return jsonify(errno=RET.OK,errmsg='OK',data=comment.to_dict())
 
 @news_blue.route('/favicon.ico')
 def favicon():
