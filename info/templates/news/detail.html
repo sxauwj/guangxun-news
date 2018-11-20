@@ -1,35 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>文章详情页</title>
-    <link rel="stylesheet" type="text/css" href="../../static/news/css/reset.css">
-    <link rel="stylesheet" type="text/css" href="../../static/news/css/main.css">
-    <script type="text/javascript" src="../../static/news/js/jquery-1.12.4.min.js"></script>
+{% extends 'news/base.html' %}
+
+{% block titleBlock %}
+首页-文章详情页
+{% endblock %}
+
+{% block jsBlock %}
     <script type="text/javascript" src="../../static/news/js/detail.js"></script>
-    <script type="text/javascript" src="../../static/news/js/main.js"></script>
-</head>
-<body>
-<div class="header_con">
-    <div class="header">
-        <a href="/" class="logo fl"><img src="../../static/news/images/logo.png" alt="logo"></a>
+{% endblock %}
 
-    <div class="user_login fr">
-            {% if data.user_info %}
-            <img src="{% if data.user_info.avatar_url %}{{ data.user_info.avatar_url }}
-                {% else %}../../static/news/images/person01.png{% endif %}" class="lgin_pic">
-            <a href="#">{{ data['user_info']['nick_name'] }}</a>
-            <a href="javascript:;" onclick="logout()">退出</a>
-        {% else %}
-            <div class="user_btns fr">
-                <a href="javascript:;" class="login_btn">登录</a>  <a href="javascript:;" class="register_btn">注册</a>
-            </div>
-        {% endif %}
-        </div>
-    </div>
-</div>
 
-<div class="conter_con">
+
+{% block contentBlock %}
     <div class="detail_con fl">
         <h3>{{ data.news_detail.title }}</h3>
         <div class="detail_about clearfix">
@@ -156,19 +137,46 @@
             <a href="javascript:;" class="focus fr">关注</a>
             <a href="javascript:;" class="focused fr"><span class="out">已关注</span><span class="over">取消关注</span></a>
         </div>
-        <div class="rank_title">
-            <h3>点击排行</h3>
+    </div>
+
+{% endblock %}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文章详情页</title>
+    <link rel="stylesheet" type="text/css" href="../../static/news/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../../static/news/css/main.css">
+    <script type="text/javascript" src="../../static/news/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="../../static/news/js/detail.js"></script>
+    <script type="text/javascript" src="../../static/news/js/main.js"></script>
+</head>
+<body>
+<div class="header_con">
+    <div class="header">
+        <a href="/" class="logo fl"><img src="../../static/news/images/logo.png" alt="logo"></a>
+
+    <div class="user_login fr">
+            {% if data.user_info %}
+            <img src="{% if data.user_info.avatar_url %}{{ data.user_info.avatar_url }}
+                {% else %}../../static/news/images/person01.png{% endif %}" class="lgin_pic">
+            <a href="#">{{ data['user_info']['nick_name'] }}</a>
+            <a href="javascript:;" onclick="logout()">退出</a>
+        {% else %}
+            <div class="user_btns fr">
+                <a href="javascript:;" class="login_btn">登录</a>  <a href="javascript:;" class="register_btn">注册</a>
+            </div>
+        {% endif %}
         </div>
-        <ul class="rank_list">
-            <li><span class="first">1</span><a href="#">势如破竹！人民币再度连闯四道关口 在岸、离岸双双升破6.42</a></li>
-            <li><span class="second">2</span><a href="#">凛冬已至，还有多少银行人在假装干银行</a></li>
-            <li><span class="third">3</span><a href="#">人民日报：部分城市楼市放松限制引关注，楼市调控不会“拉抽屉”</a></li>
-            <li><span>4</span><a href="#">势如破竹！人民币再度连闯四道关口 在岸、离岸双双升破6.42</a></li>
-            <li><span>5</span><a href="#">凛冬已至，还有多少银行人在假装干银行</a></li>
-            <li><span>6</span><a href="#">人民日报：部分城市楼市放松限制引关注，楼市调控不会“拉抽屉”</a></li>
-        </ul>
     </div>
 </div>
+
+<div class="conter_con">
+
 <div class="footer">
     <div class="footer_links">
         <a href="">关于我们</a>
