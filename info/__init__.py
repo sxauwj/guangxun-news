@@ -5,17 +5,17 @@ from flask_sqlalchemy import SQLAlchemy
 # 集成状态保持扩展
 from flask_session import Session
 # 导入class_dict字典
-from config import class_dict,Config
+from config import class_dict, Config
 # 集成python的标准日志模块
 import logging
 from logging.handlers import RotatingFileHandler
 # 导入redis模块
 from redis import StrictRedis
 # 项目开启csrf保护
-from flask_wtf import CSRFProtect,csrf
+from flask_wtf import CSRFProtect, csrf
 
 # 实例化redis对象，因为redis取出来的数据是二进制，需要加上decode_responses 让响应转为字符串
-redis_store = StrictRedis(host=Config.REDIS_HOST,port=Config.REDIS_PORT,decode_responses=True)
+redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT, decode_responses=True)
 
 # 创建sqlalchemy对象
 db = SQLAlchemy()
@@ -56,7 +56,7 @@ def create_app(config_name):
     @app.after_request
     def after_request(response):
         csrf_token = csrf.generate_csrf()
-        response.set_cookie('csrf_token',csrf_token)
+        response.set_cookie('csrf_token', csrf_token)
         return response
 
     # 导入蓝图对象
@@ -65,9 +65,11 @@ def create_app(config_name):
     app.register_blueprint(news_blue)
     from info.modules.passport import passport_blue
     app.register_blueprint(passport_blue)
+    from info.modules.profile import profile_blue
+    app.register_blueprint(profile_blue)
 
     # 导入自定义过滤器
     from info.utils.commons import index_filter
-    app.add_template_filter(index_filter,'index_filter')
+    app.add_template_filter(index_filter, 'index_filter')
     # 返回app
     return app
