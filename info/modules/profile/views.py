@@ -23,7 +23,7 @@ def user_info():
         'user':user.to_dict()
     }
     return render_template('news/user.html',data=data)
-@profile_blue.route('base_info',methods=['GET','POST'])
+@profile_blue.route('/base_info',methods=['GET','POST'])
 @login_required
 def base_info():
     """

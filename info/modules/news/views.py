@@ -68,8 +68,6 @@ def index():
     category_list = []
     for category in categories:
         category_list.append(category.to_dict())
-        print('category', category)
-        print('category_to_dict', category.to_dict())
 
     data = {
         # 三元运算　如果user存在则user_info有值否则为None
