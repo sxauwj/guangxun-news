@@ -3,7 +3,7 @@ from . import passport_blue
 # 导入captcha工具，生成图片验证码
 from info.utils.captcha.captcha import captcha
 # 导入flask内置对象
-from flask import request, jsonify, current_app, make_response, session,render_template,redirect
+from flask import request, jsonify, current_app, make_response, session, render_template, redirect
 # 导入自定义状态码
 from info.utils.response_code import RET
 # 导入redis实例 导入常量 导入db实例对象
@@ -16,6 +16,7 @@ from info.libs.yuntongxun.sms import CCP
 from info.models import User
 # 导入日期模块
 from datetime import datetime
+
 
 @passport_blue.route('/image_code')
 def generate_image_code():
@@ -217,7 +218,8 @@ def register():
     # 返回结果
     return jsonify(errno=RET.OK, errmsg='OK')
 
-@passport_blue.route('/login',methods=['POST'])
+
+@passport_blue.route('/login', methods=['POST'])
 def login():
     """
     用户登录
@@ -239,19 +241,19 @@ def login():
     mobile = request.json.get('mobile')
     password = request.json.get('password')
     # 检查参数
-    if not  all([mobile,password]):
+    if not all([mobile, password]):
         return jsonify(errno=RET.PARAMERR, errmsg='参数缺失')
     # 检查手机号的格式
-    if not re.match(r'1[3456789]\d{9}$',mobile):
+    if not re.match(r'1[3456789]\d{9}$', mobile):
         return jsonify(errno=RET.PARAMERR, errmsg='手机号格式错误')
     # 检查手机号是否注册
     try:
         user = User.query.filter_by(mobile=mobile).first()
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,errmsg='查询数据库失败')
+        return jsonify(errno=RET.DBERR, errmsg='查询数据库失败')
     if user is None or not user.check_password(password):
-        return jsonify(errno=RET.DATAERR,errmsg='用户名或密码错误')
+        return jsonify(errno=RET.DATAERR, errmsg='用户名或密码错误')
 
     # 保存登录时间
     user.last_login = datetime.now()
@@ -261,7 +263,7 @@ def login():
         db.session.commit()
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,errmsg='保存用户数据失败')
+        return jsonify(errno=RET.DBERR, errmsg='保存用户数据失败')
     # 缓存用户信息
     session['user_id'] = user.id
     session['mobile'] = mobile
@@ -269,7 +271,8 @@ def login():
     # 确保redis中的缓存数据和mysql中的真实数据是一致的
     session['nick_name'] = user.nick_name
     # 返回结果
-    return jsonify(errno=RET.OK,errmsg='OK')
+    return jsonify(errno=RET.OK, errmsg='OK')
+
 
 @passport_blue.route('/logout')
 def logout():
@@ -278,8 +281,10 @@ def logout():
     本质是清除redis中缓存的用户信息
     :return:
     """
-    #　有user_id 就删除，没有就返回None
-    session.pop('user_id',None)
-    session.pop('mobile',None)
-    session.pop('nick_name',None)
-    return jsonify(errno=RET.OK,errmsg='OK')
+    # 　有user_id 就删除，没有就返回None
+    session.pop('user_id', None)
+    session.pop('mobile', None)
+    session.pop('nick_name', None)
+    # 完善管理员退出的逻辑
+    session.pop('is_admin', None)
+    return jsonify(errno=RET.OK, errmsg='OK')

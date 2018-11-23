@@ -63,10 +63,15 @@ def create_app(config_name):
     from info.modules.news import news_blue
     # 注册蓝图
     app.register_blueprint(news_blue)
+
     from info.modules.passport import passport_blue
     app.register_blueprint(passport_blue)
+
     from info.modules.profile import profile_blue
     app.register_blueprint(profile_blue)
+
+    from info.modules.admin import admin_blue
+    app.register_blueprint(admin_blue)
 
     # 导入自定义过滤器
     from info.utils.commons import index_filter
