@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>用户中心</title>
-    <link rel="stylesheet" type="text/css" href="../../static/news/css/reset.css">
-    <link rel="stylesheet" type="text/css" href="../../static/news/css/main.css">
-    <script type="text/javascript" src="../../static/news/js/jquery-1.12.4.min.js"></script>
-    <script type="text/javascript" src="../../static/news/js/jquery.form.min.js"></script>
-    <script type="text/javascript" src="../../static/news/js/main.js"></script>
+    	<link rel="stylesheet" type="text/css" href="../../static/news/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="../../static/news/css/main.css">
+	<script type="text/javascript" src="../../static/news/js/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../static/news/js/jquery.form.min.js"></script>
+	<script type="text/javascript" src="../../static/news/js/main.js"></script>
 </head>
 <body>
 <div class="header_con">
@@ -31,7 +31,8 @@
 			</div>
 			<div class="user_center_name">{{ data.user.nick_name }}</div>
 
-                {#	<li class="active"><a href="/user/base_info" target="main_frame">基本资料</a></li>#}
+			<ul class="option_list">
+{#				<li class="active"><a href="/user/base_info" target="main_frame">基本资料</a></li>#}
 				<li class="active"><a href="{{ url_for("profile_blue.base_info") }}" target="main_frame">基本资料</a></li>
 
                 <li><a href="/user/pic_info" target="main_frame">头像设置</a></li>
