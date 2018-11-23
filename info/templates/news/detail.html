@@ -15,7 +15,7 @@
         <h3>{{ data.news_detail.title }}</h3>
         <div class="detail_about clearfix">
             <span class="time_souce fl">{{ data.news_detail.create_time }} 来源: {{ data.news_detail.source }}</span>
-            <span class="comment fr">{{ data.news_detail.comments_count }}</span>
+            <span class="comment fr ">{{ data.news_detail.comments_count }}</span>
         </div>
 
         {{ data.news_detail.content | safe }}
@@ -31,7 +31,7 @@
         {% if data.user_info %}
         <form action="" class="comment_form" data-newsid="{{ data.news_detail.id }}">
             <div class="person_pic">
-                <img src="{% if data.user_info.avatar_url %}{{ data.user_info.avatar_url }}{% else %}../../static/news/images/person01.png" {% endif %}alt="用户图标">
+                <img src="{% if data.user_info.avatar_url %}{{ data.user_info.avatar_url }}{% else %}../../static/news/images/person01.png {% endif %}" alt="用户图标">
             </div>
             <textarea placeholder="请发表您的评论" class="comment_input"></textarea>
             <input type="submit" name="" value="评 论" class="comment_sub">

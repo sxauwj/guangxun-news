@@ -12,7 +12,7 @@
 <body>
 <div class="header_con">
     <div class="header">
-        <a href="#" class="logo fl"><img src="../../static/news/images/logo.png" alt="logo"></a>
+        <a href="/" class="logo fl"><img src="../../static/news/images/logo.png" alt="logo"></a>
         {% if data.user %}
             <div class="user_login fr" style="display: block;">
 				 <img src={% if data.user.avatar_url %} {{ data.user.avatar_url }}{% else %}"../../static/news/images/person01.png"{% endif %} class="lgin_pic">
@@ -40,7 +40,7 @@
 				<li><a href="/user/pass_info" target="main_frame">密码修改</a></li>
 				<li><a href="/user/collection" target="main_frame">我的收藏</a></li>
 				<li><a href="/user/news_release" target="main_frame">新闻发布</a></li>
-				<li><a href="/user/news_list" target="main_frame">新闻列表</a></li>
+				<li><a href="/user/todo_news_list" target="main_frame">新闻列表</a></li>
 			</ul>
 		</div>
 
