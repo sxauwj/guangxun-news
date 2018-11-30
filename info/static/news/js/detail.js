@@ -229,9 +229,11 @@ $(function () {
                         if (action == "add") {
                             like_count = parseInt(like_count) + 1
                             // 代表是点赞
+
                             $this.addClass('has_comment_up')
                         }else {
                             like_count = parseInt(like_count) - 1
+
                             $this.removeClass('has_comment_up')
                         }
                         // 更新点赞数据

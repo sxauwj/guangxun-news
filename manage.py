@@ -40,5 +40,5 @@ def create_supperuser(name, password):
 
 
 if __name__ == '__main__':
-    print(app.url_map)
+    # print(app.url_map)
     manage.run()
